@@ -1,0 +1,87 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "fancy-amazon-ses"
+version = "0.1.0"
+description = "Amazon SES for Python — the service descriptor, its faker, its webhook verification, and one function per operation. Plain HTTP; no vendor SDK."
+readme = "README.md"
+# 3.11 matches fancy-flow-py's floor: 3.10 reaches end of life on 2026-10-31,
+# and a floor that dies before the package's second release is not a floor.
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Particle Academy" }]
+keywords = ["amazon_ses", "email", "connector", "api", "fancy-flow", "particle-academy"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries",
+    "Typing :: Typed",
+]
+
+# ZERO runtime dependencies, and that is a design constraint rather than an
+# accident. There is no Python twin of fancy-connector-core to depend on, and a
+# vendor SDK is third-party code subject to the kit's full approval bar — one
+# SDK per provider is hundreds of dependencies nobody is tracking. The HTTP is
+# stdlib `urllib`; the HMAC is stdlib `hmac`.
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/Fancy-Friends/amazon-ses"
+Issues = "https://github.com/Fancy-Friends/amazon-ses/issues"
+Source = "https://github.com/Fancy-Friends/amazon-ses"
+
+[dependency-groups]
+# Not optional. A package with no way to run its tests reports green by doing
+# nothing, which is the one defect that hides itself.
+test = ["pytest>=8.0"]
+lint = ["ruff>=0.16"]
+typecheck = ["mypy>=1.11"]
+dev = [{ include-group = "test" }, { include-group = "lint" }, { include-group = "typecheck" }]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/fancy_amazon_ses"]
+
+[tool.hatch.build.targets.sdist]
+include = ["/src", "/tests", "/README.md", "/CHANGELOG.md", "/LICENSE"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# importlib mode pairs with src-layout: the working tree is never on sys.path,
+# so the tests exercise the INSTALLED package. Under the default mode a missing
+# py.typed or an unshipped file passes locally and breaks for every user.
+addopts = "--import-mode=importlib -ra"
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+target-version = "py311"
+
+[tool.ruff.lint]
+# `S` — flake8-bandit — is ON, and it is the one addition worth arguing for: this
+# package handles a credential, builds an HMAC, and opens a URL. Security lint
+# belongs on exactly this code.
+#
+# It also makes the two `# noqa: S310` in _runtime.py MEANINGFUL. Without `S`
+# selected, ruff reports them as unused directives (RUF100) and the obvious fix
+# is to delete them — which quietly removes a security annotation because a
+# linter was not looking for it.
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF", "N", "C4", "PT", "S"]
+
+[tool.ruff.lint.per-file-ignores]
+# pytest's whole idiom is bare `assert`. S101 would fail every test file.
+"tests/*" = ["S101"]
+
+[tool.mypy]
+python_version = "3.11"
+packages = ["fancy_amazon_ses"]
+mypy_path = "src"
+strict = true
+disallow_any_expr = false
+disallow_any_explicit = false

@@ -1,0 +1,98 @@
+{
+  "operation": "email_send",
+  "kind": "email_send",
+  "title": "Send email",
+  "description": "Send an email through Amazon SES.",
+  "summary": "send an email",
+  "icon": "✉",
+  "docs": "https://docs.aws.amazon.com/ses/latest/APIReference-V2/API_SendEmail.html",
+
+  "sideEffects": "unsafe-to-replay",
+  "$sideEffectsComment": "SES has no idempotency header, so a retry sends a second email. Resend declares `idempotent` because it accepts a key and the generated executor supplies one; there is nothing equivalent here, so this is the honest answer rather than the matching one.",
+
+  "request": {
+    "method": "POST",
+    "path": "/v2/email/outbound-emails",
+    "encoding": "json"
+  },
+
+  "requireOneOf": {
+    "keys": ["text", "html"],
+    "error": "needs a \"text\" or \"html\" body — SES refuses a Content.Simple with neither, and an empty email is never intended"
+  },
+
+  "config": [
+    {
+      "type": "text",
+      "key": "from",
+      "label": "From",
+      "placeholder": "Team <team@yourdomain.com>",
+      "description": "Must be a VERIFIED identity in this region. An address verified in another region does not exist here.",
+      "required": true,
+      "send": { "as": "FromEmailAddress", "value": "string", "transform": "trim" }
+    },
+    {
+      "type": "expression",
+      "key": "to",
+      "label": "To",
+      "example": "{{ $json.email }}",
+      "description": "One address, a comma-separated list, or an expression. While the account is in the SES sandbox, anything not verified is accepted by the API and silently never delivered.",
+      "required": true,
+      "send": { "as": "Destination.ToAddresses", "value": "list", "separator": "," }
+    },
+    {
+      "type": "expression",
+      "key": "cc",
+      "label": "Cc",
+      "send": { "as": "Destination.CcAddresses", "value": "list", "separator": ",", "omitEmpty": true }
+    },
+    {
+      "type": "expression",
+      "key": "replyTo",
+      "label": "Reply-To",
+      "send": { "as": "ReplyToAddresses", "value": "list", "separator": ",", "omitEmpty": true }
+    },
+    {
+      "type": "expression",
+      "key": "subject",
+      "label": "Subject",
+      "example": "Your order {{ $json.order_id }}",
+      "required": true,
+      "send": { "as": "Content.Simple.Subject.Data", "value": "string" }
+    },
+    {
+      "type": "textarea",
+      "key": "text",
+      "label": "Plain-text body",
+      "rows": 4,
+      "send": { "as": "Content.Simple.Body.Text.Data", "value": "string", "omitEmpty": true }
+    },
+    {
+      "type": "textarea",
+      "key": "html",
+      "label": "HTML body",
+      "rows": 6,
+      "send": { "as": "Content.Simple.Body.Html.Data", "value": "string", "omitEmpty": true }
+    },
+    {
+      "type": "text",
+      "key": "configurationSet",
+      "label": "Configuration set",
+      "description": "Optional. SES routes engagement events (bounces, complaints, opens) through the set you name.",
+      "send": { "as": "ConfigurationSetName", "value": "string", "omitEmpty": true }
+    }
+  ],
+
+  "defaultConfig": { "mode": "auto" },
+
+  "outputShape": [
+    { "path": "mode", "type": "string", "description": "Which estate this ran against. SES has no separate one, so: fake or live." },
+    { "path": "connection", "type": "string", "description": "The connection id that was used." },
+    { "path": "data.MessageId", "type": "string", "description": "SES's id for the send. It means ACCEPTED, not delivered — and in the sandbox an unverified recipient is accepted and discarded." }
+  ],
+
+  "contract": {
+    "sends": ["FromEmailAddress", "Destination", "ReplyToAddresses", "Content", "ConfigurationSetName"],
+    "reads": ["MessageId"]
+  }
+}

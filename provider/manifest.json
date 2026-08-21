@@ -1,0 +1,56 @@
+{
+  "$comment": "THE hand-written part. Four packages -- ui, js, php, py -- are generated from this directory and are never edited. Fix this file, then regenerate.",
+
+  "connectorApi": 1,
+
+  "service": "amazon_ses",
+  "title": "Amazon SES",
+  "domain": "email",
+  "docs": "https://docs.aws.amazon.com/ses/latest/APIReference-V2/API_SendEmail.html",
+
+  "auth": "aws_sigv4",
+  "requires": ["accessKeyId", "secretAccessKey", "region"],
+
+  "authorize": {
+    "kind": "aws-sigv4",
+    "credential": "accessKeyId",
+    "secretCredential": "secretAccessKey",
+    "regionCredential": "region",
+    "service": "ses",
+    "$comment": "Signature Version 4, read from AWS's own service model (metadata.signatureVersion = v4, signingName = ses). Not a header holding a key: the request is SIGNED, so the method, the path, the query, the headers and a hash of the body all go into a canonical form that is HMAC'd with a key derived from the secret, the date, the region and the service. Nothing else in this kit signs a request -- every provider so far presents a static credential."
+  },
+
+  "sandbox": "restricted-reach",
+  "baseUrls": {
+    "live": "https://email.{region}.amazonaws.com",
+    "$comment": "The host carries the REGION, which is a per-connection credential rather than a constant. Every provider before this one had a base URL that was the same string for everybody."
+  },
+  "sandboxNote": "A new SES account is in the SANDBOX, and it is the reason `restricted-reach` exists as a value. The endpoint is identical, the credentials are identical, the request is identical, and the API answers 200 with a MessageId -- but the mail only reaches addresses you have verified. Anyone else is silently discarded. So a sandbox run looks completely successful and reached nobody, which is why `restricted-reach` cannot be selected as a mode: there is nothing to select. You leave the sandbox by asking AWS for production access, not by pointing at a different host.",
+
+  "encoding": "json",
+
+  "credentialFields": [
+    {
+      "key": "accessKeyId",
+      "label": "Access key ID",
+      "scope": "account",
+      "secret": false,
+      "help": "AKIA... from an IAM user or role with ses:SendEmail. Not secret on its own -- it identifies the key, and the secret below is what proves it."
+    },
+    {
+      "key": "secretAccessKey",
+      "label": "Secret access key",
+      "scope": "account",
+      "secret": true,
+      "help": "Shown ONCE when the key is created. It is never sent: it derives the signing key, and only the signature goes over the wire."
+    },
+    {
+      "key": "region",
+      "label": "Region",
+      "scope": "account",
+      "secret": false,
+      "placeholder": "eu-west-1",
+      "help": "Part of the HOST and part of the SIGNATURE, so a mismatch fails as a signature error rather than as a wrong-endpoint one. Verified identities are per-region: a domain verified in us-east-1 does not exist in eu-west-1."
+    }
+  ]
+}

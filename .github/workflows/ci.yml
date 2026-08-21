@@ -1,0 +1,168 @@
+# GENERATED — from weaver's template/repo/.github/workflows/ci.yml.
+# Fix it there and re-run `npm run provider -- amazon-ses`; an edit here is
+# destroyed by the next protocol sync.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# The publish token is never available here. `publish.yml` triggers on tags only,
+# and a `pull_request` run can execute a fork's code — with a scope-wide npm
+# token that reaches every @particle-academy package, react-fancy included.
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  generated:
+    name: nothing under packages/ was hand-edited
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      # The generated-code rule WILL be violated by someone in a hurry, and a
+      # hand-edit is destroyed by the next protocol sync — so failing here is
+      # the kind outcome.
+      #
+      # Verified against `.weaver.json`, which weaver emitted beside every other
+      # file. NOT by checking out weaver and regenerating: weaver.agi is
+      # PRIVATE, and this repo's `github.token` cannot read a different private
+      # repo — that job failed at checkout and so enforced nothing at all.
+      #
+      # This answers the question that belongs HERE: did somebody edit packages/
+      # in this repo. Whether this repo is STALE against a newer template is
+      # weaver's question, and weaver's own CI is the only place with both halves.
+      - name: Verify the integrity manifest
+        run: |
+          node -e '
+            const { createHash } = require("node:crypto");
+            const fs = require("node:fs");
+
+            const manifest = JSON.parse(fs.readFileSync(".weaver.json", "utf8"));
+            const problems = [];
+
+            for (const [file, expected] of Object.entries(manifest.files)) {
+              if (!fs.existsSync(file)) {
+                problems.push("missing:  " + file);
+                continue;
+              }
+
+              const actual = createHash("sha256")
+                .update(fs.readFileSync(file, "utf8"), "utf8")
+                .digest("hex");
+
+              if (actual !== expected) problems.push("modified: " + file);
+            }
+
+            if (problems.length) {
+              console.error("::error::" + problems.length + " generated file(s) differ from what weaver emitted");
+              for (const problem of problems) console.error("  " + problem);
+              console.error("");
+              console.error("Fix provider/ — or weavers template/ — and regenerate:");
+              console.error("    npm run provider -- amazon-ses");
+              process.exit(1);
+            }
+
+            console.log(Object.keys(manifest.files).length + " generated files match .weaver.json");
+          '
+
+  allowlist:
+    name: third-party allowlist
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      # FETCHED, never vendored: one source, no copies to drift. Checked out
+      # rather than curled, because the checker reads its allowlist from beside
+      # itself — this is the form every kit repo already uses.
+      - name: Fetch the third-party allowlist
+        uses: actions/checkout@v5
+        with:
+          repository: Particle-Academy/.github
+          path: .third-party-allowlist
+          persist-credentials: false
+
+      # Covers all four packages at once: npm dependencies, Composer require,
+      # and the Python project table. A vendor SDK cannot arrive unnoticed.
+      - name: Third-party dependency allowlist
+        run: |
+          node .third-party-allowlist/third-party/check.mjs --repo .
+          node -e "require('node:fs').rmSync('.third-party-allowlist',{recursive:true,force:true})"
+
+  npm:
+    # QUOTED. Every npm package here starts with "@", and an unquoted plain
+    # scalar cannot begin with a YAML indicator character -- GitHub rejects the
+    # whole file with "a workflow file issue" and no line number.
+    name: "@particle-academy/amazon-ses-ui + @particle-academy/amazon-ses-js"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      # From the ROOT, so the npm workspace links packages/ui into packages/js.
+      # `@particle-academy/amazon-ses-js` depends on `@particle-academy/amazon-ses-ui` by its PUBLISHED name, because that
+      # is what a consumer installs — and until the first successful publish,
+      # that name does not resolve on the registry. Installing per-package would
+      # therefore leave this repo's CI red from birth, gating nothing.
+      - run: npm install
+
+      # BUILD FIRST. `@particle-academy/amazon-ses-js` imports the node kinds from `@particle-academy/amazon-ses-ui`, whose
+      # `types` point at ./dist — which does not exist on a clean checkout. A
+      # lint-then-build order fails every time and says nothing about the code.
+      # `--workspaces` runs in root order, and ui is listed first.
+      - run: npm run build --workspaces
+
+      - run: npm run lint --workspaces
+      - run: npm test --workspaces
+
+  php:
+    name: particle-academy/amazon-ses-php
+    runs-on: ubuntu-latest
+    # From the ROOT: composer.json lives there, because Packagist reads the
+    # repository's default branch and refuses a subdirectory package.
+    steps:
+      - uses: actions/checkout@v5
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          coverage: none
+      - run: composer install --no-interaction --prefer-dist
+      - run: composer run lint
+      - run: composer run test
+
+  py:
+    name: fancy-amazon-ses
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/py
+    strategy:
+      matrix:
+        python: ["3.11", "3.13"]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pip install --upgrade pip build pytest ruff mypy
+      # Install the BUILT package, not the working tree: under the default
+      # import mode a missing py.typed or an unshipped file passes locally and
+      # breaks for every user.
+      - run: pip install .
+      - run: ruff check .
+      - run: mypy
+      - run: pytest

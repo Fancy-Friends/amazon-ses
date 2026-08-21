@@ -1,0 +1,9 @@
+{
+  "$comment": "SES answers SendEmail with exactly one field: {\"MessageId\": \"...\"}. Read from AWS's own service model (SendEmailResponse has a single member, OutboundMessageId), not from memory. Thin on purpose -- a faker richer than the provider lets an author wire a path that works against the fake and is undefined on the first real send.",
+  "operation": "email_send",
+
+  "response": {
+    "MessageId": { "$fake": "hex", "length": 60 },
+    "$idComment": "SES message ids are long opaque strings rather than a prefixed id or a uuid, so `hex` is the faithful shape here."
+  }
+}
