@@ -7,7 +7,7 @@ namespace ParticleAcademy\AmazonSes;
 use ParticleAcademy\Connectors\Mode;
 use ParticleAcademy\Connectors\PreparedRequest;
 use ParticleAcademy\Connectors\SandboxKind;
-use ParticleAcademy\\Connectors\\SigV4;
+use ParticleAcademy\Connectors\SigV4;
 use ParticleAcademy\Connectors\ServiceDescriptor;
 
 /*
