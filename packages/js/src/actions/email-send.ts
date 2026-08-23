@@ -106,8 +106,14 @@ function nestFields(flat: Record<string, unknown>): Record<string, unknown> {
 
     while (parts.length > 1) {
       const key = parts.shift() as string;
+      // A NUMERIC segment is an array index: `dateRanges.0.startDate` has to
+      // become `[{startDate}]`, not `{"0": {startDate}}`. PHP produced the
+      // array by accident (its integer-keyed arrays serialise as JSON lists)
+      // and the other two produced an object, which the provider rejects as
+      // the wrong type. The parity suite is what caught the disagreement.
+      const wantsArray = /^d+$/.test(parts[0] ?? "");
 
-      if (typeof node[key] !== "object" || node[key] === null) node[key] = {};
+      if (typeof node[key] !== "object" || node[key] === null) node[key] = wantsArray ? [] : {};
       node = node[key] as Record<string, unknown>;
     }
 

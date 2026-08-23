@@ -132,7 +132,32 @@ def _nest_fields(flat: dict[str, Any]) -> dict[str, Any]:
 
         node[parts[-1]] = value
 
-    return out
+    # The ROOT is always an object -- a JSON body's top level is never a list
+    # -- so only its VALUES are converted. That also keeps the return type
+    # honest: `_listify` returns Any, and returning it directly is a
+    # no-any-return error under mypy --strict.
+    return {key: _listify(value) for key, value in out.items()}
+
+
+def _listify(node: Any) -> Any:
+    """A mapping whose keys are 0, 1, 2 ... is an ARRAY, not an object.
+
+    `dateRanges.0.startDate` has to become `[{...}]`. PHP produced the list by
+    accident -- its integer-keyed arrays serialise as JSON arrays -- while
+    TypeScript and Python produced `{"0": {...}}`, which the provider refuses
+    as the wrong type. The parity suite is what caught the disagreement, and
+    converting at the END keeps the walk above simple.
+    """
+    if not isinstance(node, dict):
+        return node
+
+    walked = {key: _listify(value) for key, value in node.items()}
+    wanted = [str(index) for index in range(len(walked))]
+
+    if walked and list(walked.keys()) == wanted:
+        return [walked[key] for key in wanted]
+
+    return walked
 
 def _destination_toaddresses_list(value: Any) -> list[str]:
     """One value, a ","-separated string, or a list — all end up a list."""
