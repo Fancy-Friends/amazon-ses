@@ -111,7 +111,7 @@ function nestFields(flat: Record<string, unknown>): Record<string, unknown> {
       // array by accident (its integer-keyed arrays serialise as JSON lists)
       // and the other two produced an object, which the provider rejects as
       // the wrong type. The parity suite is what caught the disagreement.
-      const wantsArray = /^d+$/.test(parts[0] ?? "");
+      const wantsArray = /^\d+$/.test(parts[0] ?? "");
 
       if (typeof node[key] !== "object" || node[key] === null) node[key] = wantsArray ? [] : {};
       node = node[key] as Record<string, unknown>;
