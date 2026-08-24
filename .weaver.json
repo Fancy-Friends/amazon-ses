@@ -34,7 +34,7 @@
     "packages/php/CHANGELOG.md": "d05248089323d88615ce9af386fa3715d7bd7c656ff7ace3e37effa2c839cbcd",
     "packages/php/LICENSE": "9c194b64f52c76e677eb84a3e30f369c82727ea58abe50670d5de3f9ccd23270",
     "packages/php/README.md": "494275770e760fd230be9add2cbf6d7deb03b1ef99d3999dab57e0c37de36475",
-    "packages/php/src/Actions/EmailSend.php": "e549e7a2f7496a132887cd77bc760461ce611664ee9ab5202ae1a898fb937259",
+    "packages/php/src/Actions/EmailSend.php": "6ebe9e2185de7099300b251db92e3060cff53d5398933a10da6271873dfc653b",
     "packages/php/src/AmazonSes.php": "96b9ff76e37a576cb10ae2ecb33def9892f47354fbd2c46e4560eb118a40d9e3",
     "packages/php/src/AmazonSesFaker.php": "f1dab49ab9419a3c840cd48788296dfc766cd10b45d2dd77e715347729555907",
     "packages/php/src/SigV4.php": "b878a856efef79c9c612d89b32a1527d8bbfbb12ec1269c471f4420d4f82632c",

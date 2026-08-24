@@ -40,9 +40,14 @@ final class EmailSend
      * later as an "invalid request" from Amazon SES.
      *
      * @param array<string,mixed> $config
-     * @return array<string,scalar>
+     * An EMPTY body is `{}`, not `[]` — and PHP cannot tell those apart, because
+     * both are `array()` and `json_encode` picks the list. So an empty one is
+     * returned as an object. TypeScript and Python have no such ambiguity, which
+     * is why this is a difference only the byte-parity suite can see.
+     *
+     * @return array<string,mixed>|\stdClass
      */
-    public static function body(array $config): array
+    public static function body(array $config): array|\stdClass
     {
         if (($config['from'] ?? null) === null || ($config['from'] ?? null) === '') {
             throw new ConnectorConfigException('email_send: "from" is required (From).');
@@ -96,7 +101,9 @@ final class EmailSend
             $body['ConfigurationSetName'] = (string) $value;
         }
 
-        return self::nestFields($body);
+        $body = self::nestFields($body);
+        $body = $body === [] ? new \stdClass() : $body;
+        return $body;
     }
 
     /**
