@@ -27,6 +27,49 @@ dependencies.
 subject to the kit's full approval bar, and one per provider is hundreds of
 dependencies nobody is tracking.
 
+## Setting it up
+
+Everything below is generated from `provider/manifest.json`, so it cannot disagree with what the packages do.
+
+### Credentials
+
+A Amazon SES connection holds 3 values.
+
+Every value here is `account` scope: one per connected account, not one per installation.
+
+| Field | Scope | Secret | Where it comes from |
+|---|---|---|---|
+| **Access key ID** | per connected account | not secret | AKIA... from an IAM user or role with ses:SendEmail. Not secret on its own -- it identifies the key, and the secret below is what proves it. |
+| **Secret access key** | per connected account | **secret** | Shown ONCE when the key is created. It is never sent: it derives the signing key, and only the signature goes over the wire. |
+| **Region** | per connected account | not secret | Part of the HOST and part of the SIGNATURE, so a mismatch fails as a signature error rather than as a wrong-endpoint one. Verified identities are per-region: a domain verified in us-east-1 does not exist in eu-west-1. |
+
+### The estate
+
+**Amazon SES has NO test estate that can be selected.** Same credentials, same endpoints, same estate — only the AUDIENCE is restricted. A run against it looks completely successful and reaches nobody.
+
+> A new SES account is in the SANDBOX, and it is the reason `restricted-reach` exists as a value. The endpoint is identical, the credentials are identical, the request is identical, and the API answers 200 with a MessageId -- but the mail only reaches addresses you have verified. Anyone else is silently discarded. So a sandbox run looks completely successful and reached nobody, which is why `restricted-reach` cannot be selected as a mode: there is nothing to select. You leave the sandbox by asking AWS for production access, not by pointing at a different host.
+
+## What it can do
+
+### Actions
+
+#### `email_send` — Send email
+
+Send an email through Amazon SES.
+
+`POST /v2/email/outbound-emails` · **unsafe to replay** — a retried durable run does it TWICE
+
+| Input | Required | What it is |
+|---|---|---|
+| `from` | yes | Must be a VERIFIED identity in this region. An address verified in another region does not exist here. |
+| `to` | yes | One address, a comma-separated list, or an expression. While the account is in the SES sandbox, anything not verified is accepted by the API and silently never delivered. |
+| `cc` | no | Cc |
+| `replyTo` | no | Reply-To |
+| `subject` | yes | Subject |
+| `text` | no | Plain-text body |
+| `html` | no | HTML body |
+| `configurationSet` | no | Optional. SES routes engagement events (bounces, complaints, opens) through the set you name. |
+
 ## Run it before you have credentials
 
 Every operation ships a **faker**, whether or not Amazon SES has a sandbox. Set a
