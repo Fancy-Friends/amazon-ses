@@ -19,7 +19,7 @@
     "packages/js/CHANGELOG.md": "23c35262873dc274fbbdc0a43c4ce0d92f6025fdf144bc06a427e581a0dd18ec",
     "packages/js/LICENSE": "9c194b64f52c76e677eb84a3e30f369c82727ea58abe50670d5de3f9ccd23270",
     "packages/js/README.md": "72d41fd4886c2b70aa0a39a893cb02d2001ebb0ddd6123eda2bfd474034be0ea",
-    "packages/js/package.json": "2147afbd8fc50e52b99cae762c9e433ef1b8aa7c9d85cf08894de187282208d1",
+    "packages/js/package.json": "db2fd81eb034af72bf33716a3bac1ed17b0f59a26680e70baa42a9253ebcf2de",
     "packages/js/src/actions/email-send.ts": "46a4fa3ac3b940fd186211c43a220c74d6072f14f52ba9acc8c1ba27ad1a0502",
     "packages/js/src/faker.ts": "aa29d25ee3add882ba2c939a1787cd74d534485d06f99ace9cdec0febfc3c257",
     "packages/js/src/flow.ts": "7c1354b0b7db2f0101166e2ba1bb09ab1a40fb8b2ecf98538728ae271beb4e3a",
