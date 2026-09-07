@@ -8,6 +8,30 @@ The four packages share one version, because they are generated from one
 `provider/` definition and a version that meant something different in each
 would be a version nobody could reason about.
 
+## [0.3.2] — 2026-09-06
+
+### Changed
+
+- **Published through npm Trusted Publishing, so these packages now carry PROVENANCE.**
+
+Every earlier release went out under a scope-wide npm token. This one is
+published by an OIDC exchange from the release workflow itself, and npm records
+which workflow in which repository built it.
+`npm view @particle-academy/amazon-ses-ui@0.3.2` shows the attestation; releases before
+this one have none.
+
+What it buys a consumer: the tarball on the registry can be tied to a public
+commit and a public workflow run, rather than to whoever held a token. What it
+does not buy: nothing about the code changed, and the runtime behaviour of all
+four packages is identical to 0.3.1.
+
+- **`repository.directory` in the npm packages.**
+
+`@particle-academy/amazon-ses-ui` and `@particle-academy/amazon-ses-js` live at
+`packages/ui` and `packages/js` inside the provider repo. npm's `repository`
+field now says so, which makes the "Repository" link on each package page point
+at the package rather than at the repository root.
+
 ## [0.3.1] — 2026-08-24
 
 ### Fixed
