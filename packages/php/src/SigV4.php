@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ParticleAcademy\Connectors;
+namespace ParticleAcademy\AmazonSes;
 
 /**
  * AWS Signature Version 4 — the PHP twin of the TypeScript and Python signers.

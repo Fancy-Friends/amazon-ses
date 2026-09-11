@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace ParticleAcademy\AmazonSes;
 
+use ParticleAcademy\Connectors\FakeValues;
 use ParticleAcademy\Connectors\Mode;
 use ParticleAcademy\Connectors\PreparedRequest;
 use ParticleAcademy\Connectors\SandboxKind;
-use ParticleAcademy\Connectors\SigV4;
 use ParticleAcademy\Connectors\ServiceDescriptor;
 
 /*
@@ -46,7 +46,6 @@ final class AmazonSes
     public const SERVICE = 'amazon_ses';
 
     public const LIVE_URL = 'https://email.{region}.amazonaws.com';
-    public const COMMENT_URL = 'The host carries the REGION, which is a per-connection credential rather than a constant. Every provider before this one had a base URL that was the same string for everybody.';
 
     /** @var list<string> Credential keys a remote call cannot proceed without. */
     public const REQUIRES = [
@@ -63,11 +62,15 @@ final class AmazonSes
             sandbox: SandboxKind::RestrictedReach,
             baseUrls: [
                 Mode::Live->value => self::LIVE_URL,
-                Mode::Comment->value => self::COMMENT_URL,
             ],
             requires: self::REQUIRES,
             authorize: self::authorize(...),
-            faker: AmazonSesFaker::respond(...),
+            // The core calls a faker ($operation, $config, $fake, $input); respond()
+            // takes TypeScript's FakeRequest shape. This is the translation.
+            faker: static fn (string $operation, array $config, FakeValues $fake, mixed $input = null): mixed => AmazonSesFaker::respond(
+                $operation,
+                ['config' => $config, 'fake' => $fake, 'input' => $input],
+            ),
         );
     }
 
