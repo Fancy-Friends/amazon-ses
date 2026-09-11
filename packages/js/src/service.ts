@@ -43,8 +43,7 @@ import { signRequest } from "./sigv4.js";
 export const CONNECTOR_API_VERSION = 1;
 
 export const AMAZON_SES_BASE_URLS = {
-  "live": "https://email.{region}.amazonaws.com",
-  "$comment": "The host carries the REGION, which is a per-connection credential rather than a constant. Every provider before this one had a base URL that was the same string for everybody."
+  "live": "https://email.{region}.amazonaws.com"
 } as const;
 
 /** Credential keys a remote call cannot proceed without. */
