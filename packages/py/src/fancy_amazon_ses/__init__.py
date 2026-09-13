@@ -21,7 +21,7 @@ from .actions.email_send import email_send
 from .faker import respond
 from .service import BASE_URLS, CONNECTOR_API_VERSION, REQUIRES, SANDBOX, SERVICE, TITLE, descriptor
 
-__version__ = "0.3.3"
+__version__ = "0.3.4"
 
 __all__ = [
     "BASE_URLS",
