@@ -51,7 +51,7 @@
     "packages/py/pyproject.toml": "19dd7636bae52699e4623ee9b9002b19b302d63c1a40733602caa577635447dc",
     "packages/py/src/fancy_amazon_ses/__init__.py": "afbaf44c65c08e00eddf0323ef6591c3da98056df0f5ca459a563997093149c6",
     "packages/py/src/fancy_amazon_ses/_fake.py": "a48e13a41afac71ecb3614693f11b3bf16a9f81059049575a0372b24e8abc672",
-    "packages/py/src/fancy_amazon_ses/_runtime.py": "5a2d65ac5bb27d5b05d764a6e23f556e6a5e93568d0d60ee8b65dd24872b151a",
+    "packages/py/src/fancy_amazon_ses/_runtime.py": "a9d3d80aafd5d632b6c77a7d3b9ec7da5d470a4a5dbae14aeb174a79745af4ef",
     "packages/py/src/fancy_amazon_ses/_sigv4.py": "e40780af3fea1cf878c453ea424b231c0c7c41249adb872f281cd340d0a64f91",
     "packages/py/src/fancy_amazon_ses/actions/__init__.py": "fe5d54446418d5c6152e860bcd7d1027d755eedca5923b159cc52f20b94c5552",
     "packages/py/src/fancy_amazon_ses/actions/email_send.py": "363fbd8f77d7745848ea056468fbd1f6bb90edf9dcd619ea5d4a4de8138e6c6d",
