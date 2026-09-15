@@ -30,6 +30,12 @@ it('email_send fakes the shape Amazon SES publishes', function () {
 
     $faked = AmazonSesFaker::respond('email_send', ['config' => $config, 'fake' => $fake]);
 
+    // Through JSON and back, because a faked EMPTY object is a stdClass — the only
+    // PHP value that spells `{}` on the wire — and `toBe` compares objects by
+    // identity. This asserts the VALUES; the `{}`-versus-`[]` spelling is what
+    // weaver's cross-runtime parity suite asserts, byte for byte.
+    $faked = json_decode((string) json_encode($faked), true, 512, JSON_THROW_ON_ERROR);
+
     expect($faked)->toBe([
         'MessageId' => 'de630d8a45905e0384533c4b989f99661ddefb5f941a3aa5ba909342b7e8',
     ]);
