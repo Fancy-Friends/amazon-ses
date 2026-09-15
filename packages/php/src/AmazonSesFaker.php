@@ -48,7 +48,7 @@ final class AmazonSesFaker
     }
 
     /** @param array<string,mixed> $config */
-    private static function EmailSend(array $config, mixed $fake): array
+    private static function EmailSend(array $config, mixed $fake): array|\stdClass
     {
         return [
         'MessageId' => $fake->hex(60),
