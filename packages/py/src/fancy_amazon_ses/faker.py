@@ -24,6 +24,18 @@ from typing import Any
 from ._fake import FakeValues
 
 
+def _as_number(value: Any) -> float | None:
+    """The coercion an `"as": "integer" | "number"` config binding uses: a value
+    that IS a number, never int(float(...))'s uncaught ValueError on one that
+    merely looks like text (a text field's auto-generated example, before an
+    author has typed a real one).
+    """
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
 def _email_send(config: dict[str, Any], fake: FakeValues) -> Any:
     return {
         "MessageId": fake.hex(60),

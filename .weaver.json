@@ -55,7 +55,7 @@
     "packages/py/src/fancy_amazon_ses/_sigv4.py": "e40780af3fea1cf878c453ea424b231c0c7c41249adb872f281cd340d0a64f91",
     "packages/py/src/fancy_amazon_ses/actions/__init__.py": "fe5d54446418d5c6152e860bcd7d1027d755eedca5923b159cc52f20b94c5552",
     "packages/py/src/fancy_amazon_ses/actions/email_send.py": "363fbd8f77d7745848ea056468fbd1f6bb90edf9dcd619ea5d4a4de8138e6c6d",
-    "packages/py/src/fancy_amazon_ses/faker.py": "25179c2217b3e0abbe618622fb1a20ff617b7b77ba988a59960ac45df84828f0",
+    "packages/py/src/fancy_amazon_ses/faker.py": "a7cc759db364d2677503de384f89c6a7a056c01da33c91746edcab529f267261",
     "packages/py/src/fancy_amazon_ses/py.typed": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "packages/py/src/fancy_amazon_ses/service.py": "e9870b20ff2006aa4704feb2fb15775f5c7c78a3f1dbb88587446f4d4fe30861",
     "packages/py/tests/test_faker.py": "2ce059a291b1a031385276d7db737a230b6ea53dda0d49d2ca3799a11b3e3d99",
