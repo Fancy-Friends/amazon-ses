@@ -20,9 +20,9 @@ return [
 
     'credentials' => [
         // Access key ID (per connected account).
-        'accessKeyId' => env('AMAZON_SES_ACCESSKEYID'),
+        'accessKeyId' => env('AMAZON_SES_ACCESS_KEY_ID', env('AMAZON_SES_ACCESSKEYID')),
         // Secret access key (per connected account, secret).
-        'secretAccessKey' => env('AMAZON_SES_SECRETACCESSKEY'),
+        'secretAccessKey' => env('AMAZON_SES_SECRET_ACCESS_KEY', env('AMAZON_SES_SECRETACCESSKEY')),
         // Region (per connected account).
         'region' => env('AMAZON_SES_REGION'),
     ],

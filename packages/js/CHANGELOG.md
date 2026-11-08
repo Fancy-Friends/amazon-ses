@@ -8,6 +8,20 @@ The four packages share one version, because they are generated from one
 `provider/` definition and a version that meant something different in each
 would be a version nobody could reason about.
 
+## [0.4.1] — 2026-11-08
+
+### Fixed
+
+- **The Laravel config's environment variable names now split camelCase**,
+  as documented. **Consumer action: none.** The old unsplit names are still
+  read as a fallback, so an app that set them keeps working; the new names
+  are preferred.
+
+  | Preferred | Still read |
+  |---|---|
+  | `AMAZON_SES_ACCESS_KEY_ID` | `AMAZON_SES_ACCESSKEYID` |
+  | `AMAZON_SES_SECRET_ACCESS_KEY` | `AMAZON_SES_SECRETACCESSKEY` |
+
 ## [0.4.0] — 2026-11-08
 
 ### Added
