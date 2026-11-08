@@ -8,6 +8,27 @@ The four packages share one version, because they are generated from one
 `provider/` definition and a version that meant something different in each
 would be a version nobody could reason about.
 
+## [0.4.0] — 2026-11-08
+
+### Added
+
+- **Laravel integration, in this package** (`src/Laravel/`), auto-discovered
+  through composer's `extra.laravel`. Laravel is SUGGESTED, never required:
+  outside a Laravel app none of it loads.
+  - a service provider that merges `config/amazon-ses.php` under
+    `connectors.amazon-ses` (credentials from the environment, or per call for a
+    multi-account app);
+  - the `AmazonSes` facade: `AmazonSes::call('<operation>', [...])` runs any action;
+  - `AmazonSes::fake()`, answered from the connector's faker, with
+    `assertSent` / `assertNotSent` / `assertNothingSent` / `assertSentCount`;
+  - its own Pest test of all of it against a booted Laravel app.
+
+### Changed
+
+- **Tests: Pest `^5`**, and `laravel/framework` `^13` as a DEV-ONLY test
+  dependency (the framework this package integrates with; nothing ships in
+  `require`).
+
 ## [0.3.4] — 2026-09-12
 
 ### Changed
